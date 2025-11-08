@@ -35,13 +35,12 @@ const Index = () => {
     <div className="min-h-screen bg-background overflow-hidden">
       {/* Hero Section */}
       <div className="relative overflow-hidden">
-        <div 
-          className="absolute inset-0 opacity-20"
-          style={{
-            backgroundImage: `url(${heroImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
+        <img 
+          src={heroImage}
+          alt="Cheerful chess pieces on a colorful board"
+          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          fetchPriority="high"
+          loading="eager"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-background/50 to-background" />
         
