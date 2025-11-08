@@ -18,10 +18,10 @@ export const buttonVariants = cva(
         success: "bg-accent text-accent-foreground hover:shadow-[0_0_20px_hsl(var(--accent)/0.4)] hover:scale-105",
       },
       size: {
-        default: "h-12 px-6 py-3 min-w-[120px]",
-        sm: "h-10 rounded-lg px-4 min-w-[100px]",
-        lg: "h-14 rounded-2xl px-8 text-lg min-w-[140px]",
-        icon: "h-12 w-12",
+        default: "h-10 px-5 py-2 min-w-[100px]",
+        sm: "h-9 rounded-lg px-3 text-sm min-w-[80px]",
+        lg: "h-12 rounded-xl px-7 text-base min-w-[120px]",
+        icon: "h-10 w-10",
       },
     },
     defaultVariants: {

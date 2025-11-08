@@ -310,56 +310,56 @@ const Game = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background p-4 overflow-hidden">
+    <div className="min-h-screen bg-background p-2 md:p-4 overflow-hidden">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6 animate-slide-up">
+        <div className="flex items-center justify-between mb-3 md:mb-6 animate-slide-up">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => navigate('/')}
-            className="hover-lift"
+            className="hover-lift h-10 w-10"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-5 h-5 md:w-6 md:h-6" />
           </Button>
           
           <div className="text-center">
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Chess King</h1>
-            <p className="text-sm text-muted-foreground mt-1">
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">Chess King</h1>
+            <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1">
               {config.mode === 'single' ? `AI: ${config.difficulty}` : 'Two Player'}
             </p>
           </div>
 
-          <div className="w-12" />
+          <div className="w-10" />
         </div>
 
-        <div className="grid md:grid-cols-[1fr_300px] gap-6">
+        <div className="grid md:grid-cols-[1fr_300px] gap-3 md:gap-6">
           {/* Board Section */}
           <div className="flex flex-col items-center animate-bounce-in">
             {/* Status Bar */}
-            <Card className="w-full max-w-[600px] p-4 mb-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div className={`w-3 h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
+            <Card className="w-full max-w-[600px] p-2.5 md:p-4 mb-2 md:mb-4">
+              <div className="flex items-center justify-between text-sm md:text-base">
+                <div className="flex items-center gap-1.5 md:gap-2">
+                  <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
                   <span className="font-semibold">
                     {gameState.currentPlayer === 'white' ? 'White' : 'Black'} to move
                   </span>
                 </div>
                 {gameState.isCheck && !gameState.isCheckmate && (
-                  <span className="text-destructive font-bold animate-pulse">CHECK!</span>
+                  <span className="text-destructive font-bold animate-pulse text-sm md:text-base">CHECK!</span>
                 )}
                 {gameState.isCheckmate && (
-                  <div className="flex items-center gap-2 text-accent">
-                    <Trophy className="w-5 h-5" />
-                    <span className="font-bold">CHECKMATE!</span>
+                  <div className="flex items-center gap-1.5 md:gap-2 text-accent">
+                    <Trophy className="w-4 h-4 md:w-5 md:h-5" />
+                    <span className="font-bold text-sm md:text-base">CHECKMATE!</span>
                   </div>
                 )}
               </div>
             </Card>
 
             {/* Chess Board */}
-            <div className="w-full max-w-[600px] aspect-square bg-border p-2 rounded-2xl shadow-[0_8px_32px_hsl(var(--foreground)/0.1)]">
-              <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-0 rounded-xl overflow-hidden">
+            <div className="w-full max-w-[600px] aspect-square bg-border p-1 md:p-2 rounded-xl md:rounded-2xl shadow-[0_8px_32px_hsl(var(--foreground)/0.1)]">
+              <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-0 rounded-lg md:rounded-xl overflow-hidden">
                 {gameState.board.map((row, rowIndex) =>
                   row.map((piece, colIndex) => {
                     const isLight = (rowIndex + colIndex) % 2 === 0;
@@ -386,7 +386,7 @@ const Game = () => {
                             draggable={piece.color === gameState.currentPlayer && !gameState.isCheckmate && !gameState.isStalemate}
                             onDragStart={(e) => handleDragStart(e, rowIndex, colIndex)}
                             className={`
-                              text-5xl md:text-6xl select-none
+                              text-4xl md:text-5xl lg:text-6xl select-none
                               ${piece.color === gameState.currentPlayer ? 'cursor-grab active:cursor-grabbing' : 'cursor-not-allowed'}
                               transition-transform hover:scale-110
                             `}
@@ -396,7 +396,7 @@ const Game = () => {
                         )}
                         
                         {isLegalMove && !piece && (
-                          <div className="w-4 h-4 rounded-full bg-board-highlight opacity-60" />
+                          <div className="w-3 h-3 md:w-4 md:h-4 rounded-full bg-board-highlight opacity-60" />
                         )}
                       </div>
                     );
@@ -406,20 +406,22 @@ const Game = () => {
             </div>
 
             {/* Controls */}
-            <div className="flex gap-3 mt-4">
+            <div className="flex gap-2 md:gap-3 mt-2 md:mt-4">
               <Button
                 variant="outline"
+                size="sm"
                 onClick={handleUndo}
                 disabled={gameState.moveHistory.length === 0}
-                className="hover-lift"
+                className="hover-lift text-xs md:text-sm"
               >
-                <RotateCcw className="w-4 h-4 mr-2" />
+                <RotateCcw className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
                 Undo
               </Button>
               <Button
                 variant="secondary"
+                size="sm"
                 onClick={handleNewGame}
-                className="hover-lift"
+                className="hover-lift text-xs md:text-sm"
               >
                 New Game
               </Button>
@@ -427,20 +429,20 @@ const Game = () => {
           </div>
 
           {/* Move History */}
-          <Card className="p-4 h-fit max-h-[600px] overflow-y-auto animate-slide-up">
-            <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
-              <span>📜</span> Move History
+          <Card className="p-3 md:p-4 h-fit max-h-[400px] md:max-h-[600px] overflow-y-auto animate-slide-up">
+            <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
+              <span className="text-sm md:text-base">📜</span> Move History
             </h3>
             {gameState.moveHistory.length === 0 ? (
-              <p className="text-sm text-muted-foreground text-center py-8">
+              <p className="text-xs md:text-sm text-muted-foreground text-center py-6 md:py-8">
                 No moves yet. Start playing!
               </p>
             ) : (
-              <div className="space-y-1">
+              <div className="space-y-0.5 md:space-y-1">
                 {gameState.moveHistory.map((move, index) => (
                   index % 2 === 0 && (
-                    <div key={index} className="flex items-center gap-2 text-sm py-1">
-                      <span className="text-muted-foreground w-8">{Math.floor(index / 2) + 1}.</span>
+                    <div key={index} className="flex items-center gap-1.5 md:gap-2 text-xs md:text-sm py-0.5 md:py-1">
+                      <span className="text-muted-foreground w-6 md:w-8">{Math.floor(index / 2) + 1}.</span>
                       <span className="font-mono flex-1">{move.notation}</span>
                       {gameState.moveHistory[index + 1] && (
                         <span className="font-mono flex-1">{gameState.moveHistory[index + 1].notation}</span>
