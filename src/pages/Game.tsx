@@ -1,0 +1,460 @@
+import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { ChevronLeft, RotateCcw, Lightbulb, Trophy } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { toast } from 'sonner';
+import { initializeBoard, getLegalMoves, isInCheck, isCheckmate, isStalemate, hasInsufficientMaterial, moveToNotation, getPieceSymbol } from '@/lib/chess/engine';
+import { GameState, Position, Move, GameConfig } from '@/lib/chess/types';
+import { getAIMove } from '@/lib/chess/ai';
+import { Card } from '@/components/ui/card';
+
+const Game = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const config = location.state as GameConfig;
+
+  const [gameState, setGameState] = useState<GameState>({
+    board: initializeBoard(),
+    currentPlayer: 'white',
+    selectedSquare: null,
+    legalMoves: [],
+    moveHistory: [],
+    isCheck: false,
+    isCheckmate: false,
+    isStalemate: false,
+    isDraw: false,
+    halfMoveClock: 0,
+    fullMoveNumber: 1,
+    enPassantTarget: null
+  });
+
+  const [draggedPiece, setDraggedPiece] = useState<{ pos: Position; element: HTMLElement } | null>(null);
+
+  // Check game state after each move
+  useEffect(() => {
+    const isCheck = isInCheck(gameState.board, gameState.currentPlayer);
+    const isCheckmateSituation = isCheck && isCheckmate(gameState);
+    const isStalemateSituation = isStalemate(gameState);
+    const isDrawSituation = gameState.halfMoveClock >= 100 || hasInsufficientMaterial(gameState.board);
+
+    if (isCheckmateSituation || isStalemateSituation || isDrawSituation) {
+      setGameState(prev => ({
+        ...prev,
+        isCheck,
+        isCheckmate: isCheckmateSituation,
+        isStalemate: isStalemateSituation,
+        isDraw: isDrawSituation
+      }));
+
+      if (isCheckmateSituation) {
+        const winner = gameState.currentPlayer === 'white' ? 'Black' : 'White';
+        toast.success(`🎉 Checkmate! ${winner} wins!`, { duration: 5000 });
+      } else if (isStalemateSituation) {
+        toast.info('Draw by stalemate!', { duration: 5000 });
+      } else if (isDrawSituation) {
+        toast.info('Draw!', { duration: 5000 });
+      }
+    } else if (isCheck) {
+      setGameState(prev => ({ ...prev, isCheck }));
+      toast.warning('Check!');
+    } else {
+      setGameState(prev => ({ ...prev, isCheck: false }));
+    }
+  }, [gameState.board, gameState.currentPlayer, gameState.halfMoveClock]);
+
+  // AI move
+  useEffect(() => {
+    if (config.mode === 'single' && 
+        gameState.currentPlayer === 'black' && 
+        !gameState.isCheckmate && 
+        !gameState.isStalemate && 
+        !gameState.isDraw &&
+        config.difficulty) {
+      const timer = setTimeout(() => {
+        const aiMove = getAIMove(gameState, config.difficulty!);
+        if (aiMove) {
+          makeMove(aiMove.from, aiMove.to);
+        }
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, [gameState.currentPlayer, config.mode, config.difficulty]);
+
+  const makeMove = (from: Position, to: Position) => {
+    const piece = gameState.board[from.row][from.col];
+    if (!piece) return;
+
+    const newBoard = gameState.board.map(row => [...row]);
+    const captured = newBoard[to.row][to.col];
+    
+    // Handle en passant capture
+    let isEnPassant = false;
+    if (piece.type === 'pawn' && 
+        gameState.enPassantTarget &&
+        to.row === gameState.enPassantTarget.row &&
+        to.col === gameState.enPassantTarget.col) {
+      isEnPassant = true;
+      const capturedPawnRow = piece.color === 'white' ? to.row + 1 : to.row - 1;
+      newBoard[capturedPawnRow][to.col] = null;
+    }
+
+    // Handle castling
+    let isCastling = false;
+    if (piece.type === 'king' && Math.abs(to.col - from.col) === 2) {
+      isCastling = true;
+      const rookCol = to.col > from.col ? 7 : 0;
+      const newRookCol = to.col > from.col ? 5 : 3;
+      const rook = newBoard[from.row][rookCol];
+      if (rook) {
+        newBoard[from.row][newRookCol] = { ...rook, hasMoved: true };
+        newBoard[from.row][rookCol] = null;
+      }
+    }
+
+    // Move piece
+    newBoard[to.row][to.col] = { ...piece, hasMoved: true };
+    newBoard[from.row][from.col] = null;
+
+    // Handle pawn promotion
+    let isPromotion = false;
+    if (piece.type === 'pawn' && (to.row === 0 || to.row === 7)) {
+      isPromotion = true;
+      newBoard[to.row][to.col] = { ...piece, type: 'queen', hasMoved: true };
+    }
+
+    // Set en passant target
+    let enPassantTarget = null;
+    if (piece.type === 'pawn' && Math.abs(to.row - from.row) === 2) {
+      enPassantTarget = {
+        row: piece.color === 'white' ? from.row - 1 : from.row + 1,
+        col: from.col
+      };
+    }
+
+    const move: Move = {
+      from,
+      to,
+      piece,
+      captured: captured || undefined,
+      isEnPassant,
+      isCastling,
+      isPromotion,
+      promotedTo: isPromotion ? 'queen' : undefined
+    };
+
+    move.notation = moveToNotation(move, gameState.board);
+
+    setGameState(prev => ({
+      ...prev,
+      board: newBoard,
+      currentPlayer: prev.currentPlayer === 'white' ? 'black' : 'white',
+      selectedSquare: null,
+      legalMoves: [],
+      moveHistory: [...prev.moveHistory, move],
+      halfMoveClock: captured || piece.type === 'pawn' ? 0 : prev.halfMoveClock + 1,
+      fullMoveNumber: prev.currentPlayer === 'black' ? prev.fullMoveNumber + 1 : prev.fullMoveNumber,
+      enPassantTarget
+    }));
+  };
+
+  const handleSquareClick = (row: number, col: number) => {
+    const piece = gameState.board[row][col];
+
+    // If a square is already selected
+    if (gameState.selectedSquare) {
+      // Try to make a move
+      const isLegalMove = gameState.legalMoves.some(
+        move => move.row === row && move.col === col
+      );
+
+      if (isLegalMove) {
+        makeMove(gameState.selectedSquare, { row, col });
+      } else if (piece?.color === gameState.currentPlayer) {
+        // Select new piece
+        const moves = getLegalMoves(gameState.board, { row, col }, gameState.currentPlayer, gameState.enPassantTarget);
+        setGameState(prev => ({
+          ...prev,
+          selectedSquare: { row, col },
+          legalMoves: moves
+        }));
+      } else {
+        // Deselect
+        setGameState(prev => ({
+          ...prev,
+          selectedSquare: null,
+          legalMoves: []
+        }));
+      }
+    } else if (piece?.color === gameState.currentPlayer) {
+      // Select piece
+      const moves = getLegalMoves(gameState.board, { row, col }, gameState.currentPlayer, gameState.enPassantTarget);
+      setGameState(prev => ({
+        ...prev,
+        selectedSquare: { row, col },
+        legalMoves: moves
+      }));
+    }
+  };
+
+  const handleDragStart = (e: React.DragEvent, row: number, col: number) => {
+    const piece = gameState.board[row][col];
+    if (piece?.color !== gameState.currentPlayer) {
+      e.preventDefault();
+      return;
+    }
+
+    const target = e.currentTarget as HTMLElement;
+    setDraggedPiece({ pos: { row, col }, element: target });
+    
+    const moves = getLegalMoves(gameState.board, { row, col }, gameState.currentPlayer, gameState.enPassantTarget);
+    setGameState(prev => ({
+      ...prev,
+      selectedSquare: { row, col },
+      legalMoves: moves
+    }));
+
+    // Make drag image transparent
+    e.dataTransfer.effectAllowed = 'move';
+    const img = new Image();
+    img.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
+    e.dataTransfer.setDragImage(img, 0, 0);
+  };
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = 'move';
+  };
+
+  const handleDrop = (e: React.DragEvent, row: number, col: number) => {
+    e.preventDefault();
+    
+    if (!draggedPiece) return;
+
+    const isLegalMove = gameState.legalMoves.some(
+      move => move.row === row && move.col === col
+    );
+
+    if (isLegalMove) {
+      makeMove(draggedPiece.pos, { row, col });
+    }
+
+    setDraggedPiece(null);
+  };
+
+  const handleNewGame = () => {
+    setGameState({
+      board: initializeBoard(),
+      currentPlayer: 'white',
+      selectedSquare: null,
+      legalMoves: [],
+      moveHistory: [],
+      isCheck: false,
+      isCheckmate: false,
+      isStalemate: false,
+      isDraw: false,
+      halfMoveClock: 0,
+      fullMoveNumber: 1,
+      enPassantTarget: null
+    });
+    toast.success('New game started!');
+  };
+
+  const handleUndo = () => {
+    if (gameState.moveHistory.length === 0) return;
+
+    const movesToUndo = config.mode === 'single' ? 2 : 1;
+    const newHistory = gameState.moveHistory.slice(0, -movesToUndo);
+    
+    // Rebuild board from history
+    const newBoard = initializeBoard();
+    let currentPlayer: 'white' | 'black' = 'white';
+    
+    for (const move of newHistory) {
+      const piece = newBoard[move.from.row][move.from.col];
+      if (piece) {
+        newBoard[move.to.row][move.to.col] = { ...piece, hasMoved: true };
+        newBoard[move.from.row][move.from.col] = null;
+        currentPlayer = currentPlayer === 'white' ? 'black' : 'white';
+      }
+    }
+
+    setGameState({
+      board: newBoard,
+      currentPlayer,
+      selectedSquare: null,
+      legalMoves: [],
+      moveHistory: newHistory,
+      isCheck: false,
+      isCheckmate: false,
+      isStalemate: false,
+      isDraw: false,
+      halfMoveClock: 0,
+      fullMoveNumber: Math.floor(newHistory.length / 2) + 1,
+      enPassantTarget: null
+    });
+
+    toast.info('Move undone');
+  };
+
+  if (!config) {
+    navigate('/');
+    return null;
+  }
+
+  const isSquareSelected = (row: number, col: number) => {
+    return gameState.selectedSquare?.row === row && gameState.selectedSquare?.col === col;
+  };
+
+  const isSquareLegalMove = (row: number, col: number) => {
+    return gameState.legalMoves.some(move => move.row === row && move.col === col);
+  };
+
+  return (
+    <div className="min-h-screen bg-background p-4 overflow-hidden">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6 animate-slide-up">
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => navigate('/')}
+            className="hover-lift"
+          >
+            <ChevronLeft className="w-6 h-6" />
+          </Button>
+          
+          <div className="text-center">
+            <h1 className="text-2xl md:text-3xl font-bold text-foreground">Chess King</h1>
+            <p className="text-sm text-muted-foreground mt-1">
+              {config.mode === 'single' ? `AI: ${config.difficulty}` : 'Two Player'}
+            </p>
+          </div>
+
+          <div className="w-12" />
+        </div>
+
+        <div className="grid md:grid-cols-[1fr_300px] gap-6">
+          {/* Board Section */}
+          <div className="flex flex-col items-center animate-bounce-in">
+            {/* Status Bar */}
+            <Card className="w-full max-w-[600px] p-4 mb-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className={`w-3 h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
+                  <span className="font-semibold">
+                    {gameState.currentPlayer === 'white' ? 'White' : 'Black'} to move
+                  </span>
+                </div>
+                {gameState.isCheck && !gameState.isCheckmate && (
+                  <span className="text-destructive font-bold animate-pulse">CHECK!</span>
+                )}
+                {gameState.isCheckmate && (
+                  <div className="flex items-center gap-2 text-accent">
+                    <Trophy className="w-5 h-5" />
+                    <span className="font-bold">CHECKMATE!</span>
+                  </div>
+                )}
+              </div>
+            </Card>
+
+            {/* Chess Board */}
+            <div className="w-full max-w-[600px] aspect-square bg-border p-2 rounded-2xl shadow-[0_8px_32px_hsl(var(--foreground)/0.1)]">
+              <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-0 rounded-xl overflow-hidden">
+                {gameState.board.map((row, rowIndex) =>
+                  row.map((piece, colIndex) => {
+                    const isLight = (rowIndex + colIndex) % 2 === 0;
+                    const isSelected = isSquareSelected(rowIndex, colIndex);
+                    const isLegalMove = isSquareLegalMove(rowIndex, colIndex);
+                    
+                    return (
+                      <div
+                        key={`${rowIndex}-${colIndex}`}
+                        className={`
+                          relative flex items-center justify-center cursor-pointer
+                          transition-all duration-200 aspect-square
+                          ${isLight ? 'bg-board-light' : 'bg-board-dark'}
+                          ${isSelected ? 'ring-4 ring-board-selected ring-inset' : ''}
+                          ${isLegalMove ? 'ring-4 ring-board-highlight ring-inset' : ''}
+                          hover:brightness-95
+                        `}
+                        onClick={() => handleSquareClick(rowIndex, colIndex)}
+                        onDragOver={handleDragOver}
+                        onDrop={(e) => handleDrop(e, rowIndex, colIndex)}
+                      >
+                        {piece && (
+                          <div
+                            draggable={piece.color === gameState.currentPlayer && !gameState.isCheckmate && !gameState.isStalemate}
+                            onDragStart={(e) => handleDragStart(e, rowIndex, colIndex)}
+                            className={`
+                              text-5xl md:text-6xl select-none
+                              ${piece.color === gameState.currentPlayer ? 'cursor-grab active:cursor-grabbing' : 'cursor-not-allowed'}
+                              transition-transform hover:scale-110
+                            `}
+                          >
+                            {getPieceSymbol(piece)}
+                          </div>
+                        )}
+                        
+                        {isLegalMove && !piece && (
+                          <div className="w-4 h-4 rounded-full bg-board-highlight opacity-60" />
+                        )}
+                      </div>
+                    );
+                  })
+                )}
+              </div>
+            </div>
+
+            {/* Controls */}
+            <div className="flex gap-3 mt-4">
+              <Button
+                variant="outline"
+                onClick={handleUndo}
+                disabled={gameState.moveHistory.length === 0}
+                className="hover-lift"
+              >
+                <RotateCcw className="w-4 h-4 mr-2" />
+                Undo
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={handleNewGame}
+                className="hover-lift"
+              >
+                New Game
+              </Button>
+            </div>
+          </div>
+
+          {/* Move History */}
+          <Card className="p-4 h-fit max-h-[600px] overflow-y-auto animate-slide-up">
+            <h3 className="font-bold text-lg mb-3 flex items-center gap-2">
+              <span>📜</span> Move History
+            </h3>
+            {gameState.moveHistory.length === 0 ? (
+              <p className="text-sm text-muted-foreground text-center py-8">
+                No moves yet. Start playing!
+              </p>
+            ) : (
+              <div className="space-y-1">
+                {gameState.moveHistory.map((move, index) => (
+                  index % 2 === 0 && (
+                    <div key={index} className="flex items-center gap-2 text-sm py-1">
+                      <span className="text-muted-foreground w-8">{Math.floor(index / 2) + 1}.</span>
+                      <span className="font-mono flex-1">{move.notation}</span>
+                      {gameState.moveHistory[index + 1] && (
+                        <span className="font-mono flex-1">{gameState.moveHistory[index + 1].notation}</span>
+                      )}
+                    </div>
+                  )
+                ))}
+              </div>
+            )}
+          </Card>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Game;
