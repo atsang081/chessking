@@ -346,7 +346,7 @@ const Game = () => {
           <div className="flex flex-col items-center animate-bounce-in">
             {/* Status Bar */}
             <Card className="w-full max-w-[600px] p-2.5 md:p-4 mb-2 md:mb-4">
-              <div className="flex items-center justify-between text-sm md:text-base">
+              <div className="flex items-center justify-center text-sm md:text-base">
                 <div className="flex items-center gap-1.5 md:gap-2">
                   <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
                   <span className="font-semibold">
@@ -354,10 +354,10 @@ const Game = () => {
                   </span>
                 </div>
                 {gameState.isCheck && !gameState.isCheckmate && (
-                  <span className="text-destructive font-bold animate-pulse text-sm md:text-base">{t('game.check')}</span>
+                  <span className="text-destructive font-bold animate-pulse text-sm md:text-base ml-4">{t('game.check')}</span>
                 )}
                 {gameState.isCheckmate && (
-                  <div className="flex items-center gap-1.5 md:gap-2 text-accent">
+                  <div className="flex items-center gap-1.5 md:gap-2 text-accent ml-4">
                     <Trophy className="w-4 h-4 md:w-5 md:h-5" />
                     <span className="font-bold text-sm md:text-base">{t('game.checkmate')}</span>
                   </div>
