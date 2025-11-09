@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
     assetsDir: "assets",
     minify: "terser",
     sourcemap: false,
+    emptyOutDir: true,
   },
   plugins: [react(), mode === "development" && componentTagger()].filter(Boolean),
   resolve: {
