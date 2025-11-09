@@ -173,19 +173,19 @@ const Index = () => {
             </div>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
               <Button
-                variant="outline"
-                size="default"
-                onClick={() => setSelectedMode(null)}
-              >
-                ← Back
-              </Button>
-              <Button
                 variant="hero"
                 size="default"
                 onClick={handleStartGame}
                 className="min-w-[160px] md:min-w-[200px]"
               >
                 Start Game
+              </Button>
+              <Button
+                variant="outline"
+                size="default"
+                onClick={() => setSelectedMode(null)}
+              >
+                ← Back
               </Button>
             </div>
           </div>
