@@ -438,7 +438,7 @@ const Game = () => {
 
           {/* Move History */}
           <Card className="p-3 md:p-4 h-fit max-h-[400px] md:max-h-[600px] overflow-y-auto animate-slide-up">
-            <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
+            <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center justify-center gap-1.5 md:gap-2">
               <span className="text-sm md:text-base">📜</span> {t('game.moveHistory')}
             </h3>
             {gameState.moveHistory.length === 0 ? (
