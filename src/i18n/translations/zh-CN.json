@@ -1,0 +1,72 @@
+{
+  "app": {
+    "title": "国际象棋之王",
+    "subtitle": "掌握国王的游戏！与AI对战或挑战朋友。"
+  },
+  "home": {
+    "chooseAdventure": "选择您的冒险",
+    "singlePlayer": "单人游戏",
+    "singlePlayerDesc": "挑战我们的智能AI，共6个难度级别",
+    "playVsAI": "对战AI",
+    "twoPlayers": "双人游戏",
+    "twoPlayersDesc": "在同一设备上与朋友本地对战",
+    "playTogether": "一起玩",
+    "selectDifficulty": "选择难度",
+    "back": "返回",
+    "startGame": "开始游戏",
+    "readyToPlay": "准备好了！",
+    "readyDesc": "准备一场激动人心的比赛！白方先走。",
+    "difficulty": {
+      "beginner": "初学者",
+      "beginnerDesc": "刚开始学习",
+      "easy": "简单",
+      "easyDesc": "学习基础",
+      "normal": "普通",
+      "normalDesc": "准备挑战",
+      "hard": "困难",
+      "hardDesc": "有经验的玩家",
+      "expert": "专家",
+      "expertDesc": "高级战术",
+      "master": "大师",
+      "masterDesc": "终极挑战"
+    },
+    "features": {
+      "officialRules": "官方规则",
+      "officialRulesDesc": "符合FIDE规则的国际象棋，包含所有特殊走法",
+      "smartAI": "智能AI",
+      "smartAIDesc": "从初学者到大师的6个难度级别",
+      "mobileReady": "移动设备就绪",
+      "mobileReadyDesc": "在任何设备上都有完美体验"
+    },
+    "footer": {
+      "feedback": "反馈",
+      "producedBy": "由Merlin Advisory Solution制作",
+      "copyright": "© 2025 版权所有"
+    }
+  },
+  "game": {
+    "aiMode": "AI",
+    "twoPlayerMode": "双人",
+    "whiteToMove": "白方走棋",
+    "blackToMove": "黑方走棋",
+    "check": "将军！",
+    "checkmate": "将死！",
+    "undo": "撤销",
+    "newGame": "新游戏",
+    "moveHistory": "走棋记录",
+    "noMovesYet": "还没有走棋。开始游戏吧！",
+    "toast": {
+      "newGameStarted": "新游戏开始！",
+      "moveUndone": "已撤销走棋",
+      "checkmateWin": "🎉 将死！{{winner}}获胜！",
+      "drawStalemate": "和局（僵局）！",
+      "draw": "和局！",
+      "check": "将军！"
+    }
+  },
+  "language": {
+    "english": "English",
+    "traditionalChinese": "繁體中文",
+    "simplifiedChinese": "简体中文"
+  }
+}

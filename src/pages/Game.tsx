@@ -7,10 +7,13 @@ import { initializeBoard, getLegalMoves, isInCheck, isCheckmate, isStalemate, ha
 import { GameState, Position, Move, GameConfig } from '@/lib/chess/types';
 import { getAIMove } from '@/lib/chess/ai';
 import { Card } from '@/components/ui/card';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 const Game = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const config = location.state as GameConfig;
 
   const [gameState, setGameState] = useState<GameState>({
@@ -48,15 +51,15 @@ const Game = () => {
 
       if (isCheckmateSituation) {
         const winner = gameState.currentPlayer === 'white' ? 'Black' : 'White';
-        toast.success(`🎉 Checkmate! ${winner} wins!`, { duration: 5000 });
+        toast.success(t('game.toast.checkmateWin', { winner }), { duration: 5000 });
       } else if (isStalemateSituation) {
-        toast.info('Draw by stalemate!', { duration: 5000 });
+        toast.info(t('game.toast.drawStalemate'), { duration: 5000 });
       } else if (isDrawSituation) {
-        toast.info('Draw!', { duration: 5000 });
+        toast.info(t('game.toast.draw'), { duration: 5000 });
       }
     } else if (isCheck) {
       setGameState(prev => ({ ...prev, isCheck }));
-      toast.warning('Check!');
+      toast.warning(t('game.toast.check'));
     } else {
       setGameState(prev => ({ ...prev, isCheck: false }));
     }
@@ -256,7 +259,7 @@ const Game = () => {
       fullMoveNumber: 1,
       enPassantTarget: null
     });
-    toast.success('New game started!');
+    toast.success(t('game.toast.newGameStarted'));
   };
 
   const handleUndo = () => {
@@ -293,7 +296,7 @@ const Game = () => {
       enPassantTarget: null
     });
 
-    toast.info('Move undone');
+    toast.info(t('game.toast.moveUndone'));
   };
 
   if (!config) {
@@ -312,6 +315,11 @@ const Game = () => {
   return (
     <div className="min-h-screen bg-background p-2 md:p-4 overflow-hidden">
       <div className="max-w-6xl mx-auto">
+        {/* Language Selector - Fixed position top right */}
+        <div className="fixed top-4 right-4 z-50">
+          <LanguageSelector />
+        </div>
+
         {/* Header */}
         <div className="flex items-center justify-between mb-3 md:mb-6 animate-slide-up">
           <Button
@@ -324,9 +332,9 @@ const Game = () => {
           </Button>
           
           <div className="text-center">
-            <h1 className="text-xl md:text-2xl font-bold text-foreground">Chess King</h1>
+            <h1 className="text-xl md:text-2xl font-bold text-foreground">{t('app.title')}</h1>
             <p className="text-xs md:text-sm text-muted-foreground mt-0.5 md:mt-1">
-              {config.mode === 'single' ? `AI: ${config.difficulty}` : 'Two Player'}
+              {config.mode === 'single' ? `${t('game.aiMode')}: ${config.difficulty}` : t('game.twoPlayerMode')}
             </p>
           </div>
 
@@ -342,16 +350,16 @@ const Game = () => {
                 <div className="flex items-center gap-1.5 md:gap-2">
                   <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
                   <span className="font-semibold">
-                    {gameState.currentPlayer === 'white' ? 'White' : 'Black'} to move
+                    {gameState.currentPlayer === 'white' ? t('game.whiteToMove') : t('game.blackToMove')}
                   </span>
                 </div>
                 {gameState.isCheck && !gameState.isCheckmate && (
-                  <span className="text-destructive font-bold animate-pulse text-sm md:text-base">CHECK!</span>
+                  <span className="text-destructive font-bold animate-pulse text-sm md:text-base">{t('game.check')}</span>
                 )}
                 {gameState.isCheckmate && (
                   <div className="flex items-center gap-1.5 md:gap-2 text-accent">
                     <Trophy className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="font-bold text-sm md:text-base">CHECKMATE!</span>
+                    <span className="font-bold text-sm md:text-base">{t('game.checkmate')}</span>
                   </div>
                 )}
               </div>
@@ -415,7 +423,7 @@ const Game = () => {
                 className="hover-lift text-xs md:text-sm"
               >
                 <RotateCcw className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
-                Undo
+                {t('game.undo')}
               </Button>
               <Button
                 variant="secondary"
@@ -423,7 +431,7 @@ const Game = () => {
                 onClick={handleNewGame}
                 className="hover-lift text-xs md:text-sm"
               >
-                New Game
+                {t('game.newGame')}
               </Button>
             </div>
           </div>
@@ -431,11 +439,11 @@ const Game = () => {
           {/* Move History */}
           <Card className="p-3 md:p-4 h-fit max-h-[400px] md:max-h-[600px] overflow-y-auto animate-slide-up">
             <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center gap-1.5 md:gap-2">
-              <span className="text-sm md:text-base">📜</span> Move History
+              <span className="text-sm md:text-base">📜</span> {t('game.moveHistory')}
             </h3>
             {gameState.moveHistory.length === 0 ? (
               <p className="text-xs md:text-sm text-muted-foreground text-center py-6 md:py-8">
-                No moves yet. Start playing!
+                {t('game.noMovesYet')}
               </p>
             ) : (
               <div className="space-y-0.5 md:space-y-1">

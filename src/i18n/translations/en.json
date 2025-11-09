@@ -1,0 +1,72 @@
+{
+  "app": {
+    "title": "Chess King",
+    "subtitle": "Master the game of kings! Play against AI or challenge a friend."
+  },
+  "home": {
+    "chooseAdventure": "Choose Your Adventure",
+    "singlePlayer": "Single Player",
+    "singlePlayerDesc": "Challenge our smart AI with 6 difficulty levels",
+    "playVsAI": "Play vs AI",
+    "twoPlayers": "Two Players",
+    "twoPlayersDesc": "Play locally with a friend on the same device",
+    "playTogether": "Play Together",
+    "selectDifficulty": "Select Difficulty",
+    "back": "Back",
+    "startGame": "Start Game",
+    "readyToPlay": "Ready to Play!",
+    "readyDesc": "Get ready for an exciting match! White moves first.",
+    "difficulty": {
+      "beginner": "Beginner",
+      "beginnerDesc": "Just starting out",
+      "easy": "Easy",
+      "easyDesc": "Learning the ropes",
+      "normal": "Normal",
+      "normalDesc": "Ready for a challenge",
+      "hard": "Hard",
+      "hardDesc": "Experienced player",
+      "expert": "Expert",
+      "expertDesc": "Advanced tactics",
+      "master": "Master",
+      "masterDesc": "Ultimate challenge"
+    },
+    "features": {
+      "officialRules": "Official Rules",
+      "officialRulesDesc": "FIDE-compliant chess with all special moves",
+      "smartAI": "Smart AI",
+      "smartAIDesc": "6 difficulty levels from beginner to master",
+      "mobileReady": "Mobile Ready",
+      "mobileReadyDesc": "Perfect experience on any device"
+    },
+    "footer": {
+      "feedback": "Feedback",
+      "producedBy": "Produced by Merlin Advisory Solution",
+      "copyright": "© 2025 All rights reserved"
+    }
+  },
+  "game": {
+    "aiMode": "AI",
+    "twoPlayerMode": "Two Player",
+    "whiteToMove": "White to move",
+    "blackToMove": "Black to move",
+    "check": "CHECK!",
+    "checkmate": "CHECKMATE!",
+    "undo": "Undo",
+    "newGame": "New Game",
+    "moveHistory": "Move History",
+    "noMovesYet": "No moves yet. Start playing!",
+    "toast": {
+      "newGameStarted": "New game started!",
+      "moveUndone": "Move undone",
+      "checkmateWin": "🎉 Checkmate! {{winner}} wins!",
+      "drawStalemate": "Draw by stalemate!",
+      "draw": "Draw!",
+      "check": "Check!"
+    }
+  },
+  "language": {
+    "english": "English",
+    "traditionalChinese": "繁體中文",
+    "simplifiedChinese": "简体中文"
+  }
+}

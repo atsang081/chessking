@@ -5,19 +5,22 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { GameMode, Difficulty } from '@/lib/chess/types';
 import heroImage from '@/assets/chess-hero.jpg';
+import { useLanguage } from '@/i18n/LanguageContext';
+import { LanguageSelector } from '@/components/LanguageSelector';
 
 const Index = () => {
   const navigate = useNavigate();
+  const { t } = useLanguage();
   const [selectedMode, setSelectedMode] = useState<GameMode | null>(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState<Difficulty>('normal');
 
   const difficulties: { value: Difficulty; label: string; description: string; icon: string }[] = [
-    { value: 'beginner', label: 'Beginner', description: 'Just starting out', icon: '🌱' },
-    { value: 'easy', label: 'Easy', description: 'Learning the ropes', icon: '🎯' },
-    { value: 'normal', label: 'Normal', description: 'Ready for a challenge', icon: '⚡' },
-    { value: 'hard', label: 'Hard', description: 'Experienced player', icon: '🔥' },
-    { value: 'expert', label: 'Expert', description: 'Advanced tactics', icon: '💎' },
-    { value: 'master', label: 'Master', description: 'Ultimate challenge', icon: '👑' },
+    { value: 'beginner', label: t('home.difficulty.beginner'), description: t('home.difficulty.beginnerDesc'), icon: '🌱' },
+    { value: 'easy', label: t('home.difficulty.easy'), description: t('home.difficulty.easyDesc'), icon: '🎯' },
+    { value: 'normal', label: t('home.difficulty.normal'), description: t('home.difficulty.normalDesc'), icon: '⚡' },
+    { value: 'hard', label: t('home.difficulty.hard'), description: t('home.difficulty.hardDesc'), icon: '🔥' },
+    { value: 'expert', label: t('home.difficulty.expert'), description: t('home.difficulty.expertDesc'), icon: '💎' },
+    { value: 'master', label: t('home.difficulty.master'), description: t('home.difficulty.masterDesc'), icon: '👑' },
   ];
 
   const handleStartGame = () => {
@@ -33,6 +36,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background overflow-hidden">
+      {/* Language Selector - Fixed position top right */}
+      <div className="fixed top-4 right-4 z-50">
+        <LanguageSelector />
+      </div>
+
       {/* Hero Section */}
       <div className="relative overflow-hidden">
         <img 
@@ -49,10 +57,10 @@ const Index = () => {
             <Crown className="w-8 h-8 md:w-12 md:h-12 text-primary" />
           </div>
           <h1 className="text-3xl md:text-5xl font-bold mb-2 md:mb-4 bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent animate-slide-up">
-            Chess King
+            {t('app.title')}
           </h1>
           <p className="text-sm md:text-lg text-muted-foreground max-w-2xl mx-auto animate-slide-up px-4">
-            Master the game of kings! Play against AI or challenge a friend.
+            {t('app.subtitle')}
           </p>
         </div>
       </div>
@@ -62,7 +70,7 @@ const Index = () => {
         {!selectedMode ? (
           <div className="space-y-4 md:space-y-6 animate-bounce-in">
             <h2 className="text-xl md:text-2xl font-bold text-center mb-4 md:mb-8">
-              Choose Your Adventure
+              {t('home.chooseAdventure')}
             </h2>
             
             <div className="grid md:grid-cols-2 gap-3 md:gap-6">
@@ -74,13 +82,13 @@ const Index = () => {
                   <div className="inline-flex items-center justify-center w-14 h-14 md:w-20 md:h-20 rounded-full bg-primary/10 group-hover:bg-primary/20 transition-colors">
                     <Cpu className="w-7 h-7 md:w-10 md:h-10 text-primary" />
                   </div>
-                  <h3 className="text-lg md:text-2xl font-bold">Single Player</h3>
+                  <h3 className="text-lg md:text-2xl font-bold">{t('home.singlePlayer')}</h3>
                   <p className="text-xs md:text-base text-muted-foreground">
-                    Challenge our smart AI with 6 difficulty levels
+                    {t('home.singlePlayerDesc')}
                   </p>
                   <div className="pt-1 md:pt-2">
                     <Button variant="hero" size="sm" className="w-full md:text-base">
-                      Play vs AI
+                      {t('home.playVsAI')}
                     </Button>
                   </div>
                 </div>
@@ -94,13 +102,13 @@ const Index = () => {
                   <div className="inline-flex items-center justify-center w-14 h-14 md:w-20 md:h-20 rounded-full bg-secondary/10 group-hover:bg-secondary/20 transition-colors">
                     <Users className="w-7 h-7 md:w-10 md:h-10 text-secondary" />
                   </div>
-                  <h3 className="text-lg md:text-2xl font-bold">Two Players</h3>
+                  <h3 className="text-lg md:text-2xl font-bold">{t('home.twoPlayers')}</h3>
                   <p className="text-xs md:text-base text-muted-foreground">
-                    Play locally with a friend on the same device
+                    {t('home.twoPlayersDesc')}
                   </p>
                   <div className="pt-1 md:pt-2">
                     <Button variant="secondary" size="sm" className="w-full md:text-base">
-                      Play Together
+                      {t('home.playTogether')}
                     </Button>
                   </div>
                 </div>
@@ -117,10 +125,10 @@ const Index = () => {
                 onClick={() => setSelectedMode(null)}
                 className="text-sm"
               >
-                ← Back
+                ← {t('home.back')}
               </Button>
               <h2 className="text-xl md:text-2xl font-bold">
-                Select Difficulty
+                {t('home.selectDifficulty')}
               </h2>
               <div className="w-16 md:w-20" />
             </div>
@@ -155,7 +163,7 @@ const Index = () => {
                 onClick={handleStartGame}
                 className="min-w-[180px] md:min-w-[240px]"
               >
-                Start Game
+                {t('home.startGame')}
               </Button>
             </div>
           </div>
@@ -166,9 +174,9 @@ const Index = () => {
               <Users className="w-8 h-8 md:w-12 md:h-12 text-secondary" />
             </div>
             <div>
-              <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4">Ready to Play!</h2>
+              <h2 className="text-2xl md:text-3xl font-bold mb-2 md:mb-4">{t('home.readyToPlay')}</h2>
               <p className="text-sm md:text-lg text-muted-foreground max-w-md mx-auto px-4">
-                Get ready for an exciting match! White moves first.
+                {t('home.readyDesc')}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
@@ -178,14 +186,14 @@ const Index = () => {
                 onClick={handleStartGame}
                 className="min-w-[160px] md:min-w-[200px]"
               >
-                Start Game
+                {t('home.startGame')}
               </Button>
               <Button
                 variant="outline"
                 size="default"
                 onClick={() => setSelectedMode(null)}
               >
-                ← Back
+                ← {t('home.back')}
               </Button>
             </div>
           </div>
@@ -195,23 +203,23 @@ const Index = () => {
         <div className="mt-8 md:mt-16 grid grid-cols-3 gap-3 md:gap-6 text-center">
           <div className="space-y-1 md:space-y-2 animate-slide-up">
             <div className="text-2xl md:text-4xl">♟️</div>
-            <h3 className="font-bold text-xs md:text-base">Official Rules</h3>
+            <h3 className="font-bold text-xs md:text-base">{t('home.features.officialRules')}</h3>
             <p className="text-xs text-muted-foreground hidden sm:block">
-              FIDE-compliant chess with all special moves
+              {t('home.features.officialRulesDesc')}
             </p>
           </div>
           <div className="space-y-1 md:space-y-2 animate-slide-up" style={{ animationDelay: '0.1s' }}>
             <div className="text-2xl md:text-4xl">🎯</div>
-            <h3 className="font-bold text-xs md:text-base">Smart AI</h3>
+            <h3 className="font-bold text-xs md:text-base">{t('home.features.smartAI')}</h3>
             <p className="text-xs text-muted-foreground hidden sm:block">
-              6 difficulty levels from beginner to master
+              {t('home.features.smartAIDesc')}
             </p>
           </div>
           <div className="space-y-1 md:space-y-2 animate-slide-up" style={{ animationDelay: '0.2s' }}>
             <div className="text-2xl md:text-4xl">📱</div>
-            <h3 className="font-bold text-xs md:text-base">Mobile Ready</h3>
+            <h3 className="font-bold text-xs md:text-base">{t('home.features.mobileReady')}</h3>
             <p className="text-xs text-muted-foreground hidden sm:block">
-              Perfect experience on any device
+              {t('home.features.mobileReadyDesc')}
             </p>
           </div>
         </div>
@@ -219,13 +227,13 @@ const Index = () => {
         {/* Footer */}
         <footer className="mt-12 md:mt-16 pt-6 md:pt-8 border-t border-border/50 text-center space-y-1">
           <p className="text-xs text-muted-foreground">
-            Feedback: <a href="mailto:cs@bitebite.app" className="hover:text-primary transition-colors">cs@bitebite.app</a>
+            {t('home.footer.feedback')}: <a href="mailto:cs@bitebite.app" className="hover:text-primary transition-colors">cs@bitebite.app</a>
           </p>
           <p className="text-xs text-muted-foreground">
-            Produced by Merlin Advisory Solution
+            {t('home.footer.producedBy')}
           </p>
           <p className="text-xs text-muted-foreground">
-            © 2025 All rights reserved
+            {t('home.footer.copyright')}
           </p>
         </footer>
       </div>
