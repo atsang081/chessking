@@ -215,6 +215,19 @@ const Index = () => {
             </p>
           </div>
         </div>
+
+        {/* Footer */}
+        <footer className="mt-12 md:mt-16 pt-6 md:pt-8 border-t border-border/50 text-center space-y-1">
+          <p className="text-xs text-muted-foreground">
+            Feedback: <a href="mailto:cs@bitebite.app" className="hover:text-primary transition-colors">cs@bitebite.app</a>
+          </p>
+          <p className="text-xs text-muted-foreground">
+            Produced by Merlin Advisory Solution
+          </p>
+          <p className="text-xs text-muted-foreground">
+            © 2025 All rights reserved
+          </p>
+        </footer>
       </div>
     </div>
   );
