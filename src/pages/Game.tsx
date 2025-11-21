@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ChevronLeft, RotateCcw, Lightbulb, Trophy } from 'lucide-react';
+import { ChevronLeft, RotateCcw, Lightbulb, Trophy, ChevronDown } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { initializeBoard, getLegalMoves, isInCheck, isCheckmate, isStalemate, hasInsufficientMaterial, moveToNotation, getPieceSymbol } from '@/lib/chess/engine';
@@ -32,6 +32,7 @@ const Game = () => {
   });
 
   const [draggedPiece, setDraggedPiece] = useState<{ pos: Position; element: HTMLElement } | null>(null);
+  const [showMoveHistory, setShowMoveHistory] = useState(false);
 
   // Check game state after each move
   useEffect(() => {
@@ -341,32 +342,36 @@ const Game = () => {
           <div className="w-10" />
         </div>
 
-        <div className="grid md:grid-cols-[1fr_300px] gap-3 md:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-3 md:gap-6">
           {/* Board Section */}
-          <div className="flex flex-col items-center animate-bounce-in">
+          <div className="flex flex-col items-center animate-bounce-in w-full">
             {/* Status Bar */}
-            <Card className="w-full max-w-[600px] p-2.5 md:p-4 mb-2 md:mb-4">
-              <div className="flex items-center justify-center text-sm md:text-base">
-                <div className="flex items-center gap-1.5 md:gap-2">
-                  <div className={`w-2.5 h-2.5 md:w-3 md:h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
-                  <span className="font-semibold">
-                    {gameState.currentPlayer === 'white' ? t('game.whiteToMove') : t('game.blackToMove')}
-                  </span>
+            <Card className="w-full max-w-[600px] p-2 md:p-4 mb-2 md:mb-4">
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center justify-center text-xs md:text-base">
+                  <div className="flex items-center gap-1 md:gap-2">
+                    <div className={`w-2 h-2 md:w-3 md:h-3 rounded-full ${gameState.currentPlayer === 'white' ? 'bg-board-light' : 'bg-board-dark'}`} />
+                    <span className="font-semibold">
+                      {gameState.currentPlayer === 'white' ? t('game.whiteToMove') : t('game.blackToMove')}
+                    </span>
+                  </div>
                 </div>
                 {gameState.isCheck && !gameState.isCheckmate && (
-                  <span className="text-destructive font-bold animate-pulse text-sm md:text-base ml-4">{t('game.check')}</span>
+                  <div className="flex justify-center">
+                    <span className="text-destructive font-bold animate-pulse text-xs md:text-base">{t('game.check')}</span>
+                  </div>
                 )}
                 {gameState.isCheckmate && (
-                  <div className="flex items-center gap-1.5 md:gap-2 text-accent ml-4">
-                    <Trophy className="w-4 h-4 md:w-5 md:h-5" />
-                    <span className="font-bold text-sm md:text-base">{t('game.checkmate')}</span>
+                  <div className="flex items-center justify-center gap-1 md:gap-2 text-accent">
+                    <Trophy className="w-3 h-3 md:w-4 md:h-4" />
+                    <span className="font-bold text-xs md:text-base">{t('game.checkmate')}</span>
                   </div>
                 )}
               </div>
             </Card>
 
             {/* Chess Board */}
-            <div className="w-full max-w-[600px] aspect-square bg-border p-1 md:p-2 rounded-xl md:rounded-2xl shadow-[0_8px_32px_hsl(var(--foreground)/0.1)]">
+            <div className="w-full max-w-[600px] aspect-square bg-border p-1 md:p-2 rounded-lg md:rounded-2xl shadow-[0_8px_32px_hsl(var(--foreground)/0.1)]">
               <div className="w-full h-full grid grid-cols-8 grid-rows-8 gap-0 rounded-lg md:rounded-xl overflow-hidden">
                 {gameState.board.map((row, rowIndex) =>
                   row.map((piece, colIndex) => {
@@ -414,32 +419,33 @@ const Game = () => {
             </div>
 
             {/* Controls */}
-            <div className="flex gap-2 md:gap-3 mt-2 md:mt-4">
+            <div className="flex gap-2 w-full max-w-[600px] mt-2 md:mt-4">
               <Button
                 variant="outline"
                 size="sm"
                 onClick={handleUndo}
                 disabled={gameState.moveHistory.length === 0}
-                className="hover-lift text-xs md:text-sm"
+                className="hover-lift text-xs flex-1"
               >
-                <RotateCcw className="w-3 h-3 md:w-4 md:h-4 mr-1 md:mr-2" />
+                <RotateCcw className="w-3 h-3 mr-1" />
                 {t('game.undo')}
               </Button>
               <Button
                 variant="secondary"
                 size="sm"
                 onClick={handleNewGame}
-                className="hover-lift text-xs md:text-sm"
+                className="hover-lift text-xs flex-1"
               >
                 {t('game.newGame')}
               </Button>
             </div>
           </div>
 
-          {/* Move History */}
-          <Card className="p-3 md:p-4 h-fit max-h-[400px] md:max-h-[600px] overflow-y-auto animate-slide-up">
+          {/* Move History - Desktop */}
+          <Card className="p-3 md:p-4 h-fit max-h-[600px] overflow-y-auto animate-slide-up hidden md:block">
             <h3 className="font-bold text-base md:text-lg mb-2 md:mb-3 flex items-center justify-center gap-1.5 md:gap-2">
-              <span className="text-sm md:text-base">📜</span> {t('game.moveHistory')}
+              <span className="text-sm md:text-base">📜</span>
+              <span>{t('game.moveHistory')}</span>
             </h3>
             {gameState.moveHistory.length === 0 ? (
               <p className="text-xs md:text-sm text-muted-foreground text-center py-6 md:py-8">
@@ -461,6 +467,47 @@ const Game = () => {
               </div>
             )}
           </Card>
+
+          {/* Move History - Mobile Collapsible */}
+          <div className="md:hidden w-full">
+            <button
+              onClick={() => setShowMoveHistory(!showMoveHistory)}
+              className="w-full flex items-center justify-between p-3 bg-card rounded-lg border border-border hover:bg-accent/50 transition-colors mb-4"
+            >
+              <span className="font-bold text-sm flex items-center gap-2">
+                <span>📜</span>
+                <span>{t('game.moveHistory')}</span>
+              </span>
+              <ChevronDown
+                className={`w-4 h-4 transition-transform ${
+                  showMoveHistory ? 'rotate-180' : ''
+                }`}
+              />
+            </button>
+            {showMoveHistory && (
+              <Card className="p-3 max-h-[300px] overflow-y-auto animate-in slide-in-from-top-2 mb-4">
+                {gameState.moveHistory.length === 0 ? (
+                  <p className="text-xs text-muted-foreground text-center py-4">
+                    {t('game.noMovesYet')}
+                  </p>
+                ) : (
+                  <div className="space-y-1">
+                    {gameState.moveHistory.map((move, index) => (
+                      index % 2 === 0 && (
+                        <div key={index} className="flex items-center gap-2 text-xs py-0.5">
+                          <span className="text-muted-foreground w-6">{Math.floor(index / 2) + 1}.</span>
+                          <span className="font-mono flex-1">{move.notation}</span>
+                          {gameState.moveHistory[index + 1] && (
+                            <span className="font-mono flex-1">{gameState.moveHistory[index + 1].notation}</span>
+                          )}
+                        </div>
+                      )
+                    ))}
+                  </div>
+                )}
+              </Card>
+            )}
+          </div>
         </div>
       </div>
     </div>
